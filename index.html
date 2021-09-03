@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        let socket = io();
+
+        socket.on('event_status_updated', (data) => {
+            console.log(data);
+        });
+
+        socket.on('task_created', (data) => {
+            console.log(data);
+        });
+    </script>
+</head>
+<body>
+ Test task
+</body>
+</html>
