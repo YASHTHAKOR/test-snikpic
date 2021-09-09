@@ -53,7 +53,8 @@ app.post('/create/task', async (req, res) => {
 
         let {
            title,
-           description
+           description,
+           parentTask
         } = req.body;
 
         if(!title || !description) {
@@ -66,7 +67,8 @@ app.post('/create/task', async (req, res) => {
             title,
             description,
             id: tasks.length + 1,
-            status: 0
+            status: 0,
+            parentTask
         };
 
         tasks.push(task);
@@ -113,8 +115,7 @@ app.put('/update/status', async (req, res) => {
 
         tasks[taskIndex].status = status;
 
-        io.emit('event_status_updated',  tasks[taskIndex]);
-
+        TaskStatusUpdate(tasks[taskIndex], status); // Event Driven function
         res.send({
             success: true
         });
@@ -123,6 +124,28 @@ app.put('/update/status', async (req, res) => {
         res.status(500).send('internal server Error');
     }
 })
+
+
+const TaskStatusUpdate = (taskInfo, status) => {
+
+    let childTaskIds = [];
+
+
+    tasks.forEach((task) => {
+       if(task.id === taskInfo.parentTask) {
+           childTaskIds.push(task.id)
+       }
+    });
+
+    tasks = tasks.map((task) => {
+        if(childTaskIds.includes(task.id)) {
+            task.status = status;
+        }
+        return task;
+    });
+
+
+}
 
 server.listen(5001, () => {
     console.log('server listening on port 5001');
